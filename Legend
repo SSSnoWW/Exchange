@@ -1,0 +1,16 @@
+   var legend = new FilteredElementCollector(doc)
+                    .OfClass(typeof(View))
+                    .Cast<View>()
+                    .Where(x => x.ViewType == ViewType.Legend)
+                    .FirstOrDefault()
+                    ;
+
+
+                if (legend==null)
+                {
+                    if (legend.CanViewBeDuplicated(ViewDuplicateOption.Duplicate))
+                    {
+                        var newLegend = legend.Duplicate(ViewDuplicateOption.Duplicate);               
+
+                    }
+                }

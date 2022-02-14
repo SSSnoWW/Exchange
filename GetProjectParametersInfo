@@ -1,0 +1,64 @@
+using Autodesk.Revit.Attributes;
+using Autodesk.Revit.DB;
+using Autodesk.Revit.UI;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Example
+{
+
+    [Transaction(TransactionMode.Manual)]
+    public class Run : IExternalCommand
+    {
+        public Result Execute(ExternalCommandData commandData, ref string message, Autodesk.Revit.DB.ElementSet elements)
+        {
+
+            var uiapp = commandData.Application;
+            var uidoc = uiapp.ActiveUIDocument;
+            var app = uiapp.Application;
+            var doc = uidoc.Document;
+
+            var projectInfo = GetProjectParametersInfo(doc);
+
+
+            StringBuilder sb = new StringBuilder();
+            foreach (var item in projectInfo)
+            {
+                sb.AppendLine(item.Name);
+            }
+
+            TaskDialog.Show("params", sb.ToString());
+
+            return Result.Succeeded;
+
+
+        }
+
+        public  List<Definition> GetProjectParametersInfo(Document doc)
+        {
+            List<Definition> paramList = new List<Definition>();
+
+            BindingMap map = doc.ParameterBindings;
+
+            DefinitionBindingMapIterator it = map.ForwardIterator();
+
+            while (it.MoveNext())
+            {
+                ElementBinding eleBinding = it.Current as ElementBinding;
+
+                Definition def = it.Key;            
+
+                if (eleBinding.Categories.Contains(doc.Settings.Categories.get_Item(BuiltInCategory.OST_ProjectInformation)) &&  def != null )
+                {             
+                    paramList.Add(def);
+                }
+            }
+
+            return paramList;
+        }
+    }
+}
